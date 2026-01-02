@@ -97,22 +97,22 @@ This section describes the end-to-end process from raw data ingestion to final c
 
 **Process**:
 
-For each feature $j$ in the dataset:
+For each feature j in the dataset:
 
 1. **Calculate Median**:
-   $$ m_j = \text{median}(X_j) $$
-   where $X_j$ is the $j$-th column of the feature matrix
+   $$m_j = \text{median}(X_j)$$
+   where X_j is the j-th column of the feature matrix
 
 2. **Compute Absolute Deviations**:
-   $$ D_j = |X_j - m_j| $$
+   $$D_j = |X_j - m_j|$$
    The absolute differences from the median for all samples
 
 3. **Calculate MAD**:
-   $$ \text{MAD}_j = \text{median}(D_j) = \text{median}(|X_j - m_j|) $$
+   $$\text{MAD}_j = \text{median}(D_j) = \text{median}(|X_j - m_j|)$$
 
 4. **Standardize Features** (optional):
-   $$ X_j^{\text{scaled}} = \frac{X_j - m_j}{k \cdot \text{MAD}_j} $$
-   where $k \approx 1.4826$ (scaling constant for consistency with standard deviation)
+   $$X_j^{\text{scaled}} = \frac{X_j - m_j}{k \cdot \text{MAD}_j}$$
+   where k ≈ 1.4826 (scaling constant for consistency with standard deviation)
 
 **Why MAD?**
 - MAD is the robust counterpart to standard deviation
@@ -129,21 +129,21 @@ For each feature $j$ in the dataset:
 
 **Process**:
 
-For each pair of features $(i, j)$ where $i, j \in [1, d]$:
+For each pair of features (i, j) where i, j ∈ [1, d]:
 
 1. **Center Data** (using medians):
-   $$ X_i^c = X_i - \text{median}(X_i) $$
-   $$ X_j^c = X_j - \text{median}(X_j) $$
+   $$X_i^c = X_i - \text{median}(X_i)$$
+   $$X_j^c = X_j - \text{median}(X_j)$$
 
 2. **Compute Element-wise Products**:
-   $$ P_{ij} = X_i^c \cdot X_j^c $$
-   (element-wise multiplication, producing $n$ values)
+   $$P_{ij} = X_i^c \cdot X_j^c$$
+   (element-wise multiplication, producing n values)
 
 3. **Calculate Co-Median**:
-   $$ \text{CoMed}_{ij} = \text{median}(P_{ij}) $$
+   $$\text{CoMed}_{ij} = \text{median}(P_{ij})$$
 
 4. **Build Co-Median Matrix**:
-   $$ \Sigma_{\text{CoMed}} \in \mathbb{R}^{d \times d} $$
+   $$\Sigma_{\text{CoMed}} \in \mathbb{R}^{d \times d}$$
    where each element is the co-median of the corresponding feature pair
 
 **Comparison with Standard Covariance**:
@@ -151,11 +151,11 @@ For each pair of features $(i, j)$ where $i, j \in [1, d]$:
 | Step | Standard PCA | COMAD PCA |
 |------|-------------|----------|
 | **Center** | Mean | Median |
-| **Product** | $(X_i - \mu_i)(X_j - \mu_j)$ | $(X_i - m_i)(X_j - m_j)$ |
+| **Product** | (X_i - μ_i)(X_j - μ_j) | (X_i - m_i)(X_j - m_j) |
 | **Aggregate** | Average (mean) | Robust (median) |
 | **Result** | Covariance | Co-Median |
 
-**Output**: Co-Median matrix $\Sigma_{\text{CoMed}}$ and standard covariance matrix $\Sigma_{\text{Mean}}$ for comparison
+**Output**: Co-Median matrix Σ_CoMed and standard covariance matrix Σ_Mean for comparison
 
 ---
 
@@ -166,26 +166,26 @@ For each pair of features $(i, j)$ where $i, j \in [1, d]$:
 **Process - For Each Method (Mean & Median)**:
 
 1. **Eigendecomposition**:
-   $$ \Sigma \cdot V = V \cdot \Lambda $$
+   $$\Sigma \cdot V = V \cdot \Lambda$$
    where:
-   - $\Sigma$ is either covariance or co-median matrix
-   - $V$ contains eigenvectors (principal components)
-   - $\Lambda$ is a diagonal matrix of eigenvalues
+   - Σ is either covariance or co-median matrix
+   - V contains eigenvectors (principal components)
+   - Λ is a diagonal matrix of eigenvalues
 
 2. **Sort by Variance/Robustness**:
-   - Order eigenvalues in descending magnitude: $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_d$
+   - Order eigenvalues in descending magnitude: λ₁ ≥ λ₂ ≥ ... ≥ λ_d
    - Reorder corresponding eigenvectors accordingly
    - Higher eigenvalues = more important components
 
 3. **Calculate Explained Variance Ratio**:
-   $$ \text{EVR}_i = \frac{\lambda_i}{\sum_{k=1}^{d} \lambda_k} \times 100\% $$
+   $$\text{EVR}_i = \frac{\lambda_i}{\sum_{k=1}^{d} \lambda_k} \times 100\%$$
 
 4. **Compute Cumulative Variance**:
-   $$ \text{Cumulative EVR} = \sum_{i=1}^{k} \text{EVR}_i $$
+   $$\text{Cumulative EVR} = \sum_{i=1}^{k} \text{EVR}_i$$
 
 **Output**: 
-- Eigenvector matrices: $V_{\text{Mean}}, V_{\text{COMAD}}$
-- Eigenvalue vectors: $\lambda_{\text{Mean}}, \lambda_{\text{COMAD}}$
+- Eigenvector matrices: V_Mean, V_COMAD
+- Eigenvalue vectors: λ_Mean, λ_COMAD
 - Variance explained by each component
 
 ---
@@ -196,21 +196,21 @@ For each pair of features $(i, j)$ where $i, j \in [1, d]$:
 
 **Process**:
 
-1. **Select Number of Components** ($k$):
+1. **Select Number of Components** (k):
    - Option A: Keep components explaining 95% of variance
    - Option B: Keep fixed number (e.g., 2D or 3D for visualization)
    - Option C: Cross-validation based on downstream task
 
 2. **Select Top Eigenvectors**:
-   $$ V_k = [v_1, v_2, \ldots, v_k] \in \mathbb{R}^{d \times k} $$
-   where $k$ is the number of selected components
+   $$V_k = [v_1, v_2, \ldots, v_k] \in \mathbb{R}^{d \times k}$$
+   where k is the number of selected components
 
 3. **Project Original Data**:
-   $$ X_{\text{projected}} = (X - \text{center}) \cdot V_k $$
+   $$X_{\text{projected}} = (X - \text{center}) \cdot V_k$$
    where center is either mean or median depending on method
 
 4. **Reconstruction** (optional, for error analysis):
-   $$ X_{\text{reconstructed}} = X_{\text{projected}} \cdot V_k^T + \text{center} $$
+   $$X_{\text{reconstructed}} = X_{\text{projected}} \cdot V_k^T + \text{center}$$
 
 **Outputs Produced**:
 - **2D Projection**: First two principal components for visualization
@@ -218,8 +218,8 @@ For each pair of features $(i, j)$ where $i, j \in [1, d]$:
 - **k-D Projection**: Top-k components for downstream analysis
 
 **Dimensions**:
-- Input: $X \in \mathbb{R}^{n \times d}$
-- Output: $X_{\text{projected}} \in \mathbb{R}^{n \times k}$ where $k \ll d$
+- Input: X ∈ ℝ^(n × d)
+- Output: X_projected ∈ ℝ^(n × k) where k << d
 
 ---
 
@@ -241,8 +241,8 @@ For each pair of features $(i, j)$ where $i, j \in [1, d]$:
 #### **B. Projection Quality Tests**
 
 **Reconstruction Error**:
-$$ \text{RE} = \frac{||X - X_{\text{reconstructed}}||_F}{||X||_F} \times 100\% $$
-where $||\cdot||_F$ is the Frobenius norm
+$$\text{RE} = \frac{\|X - X_{\text{reconstructed}}\|_F}{\|X\|_F} \times 100\%$$
+where ||·||_F is the Frobenius norm
 
 **Variance Explained**:
 - Compare how much variance each method explains with the same $k$ components
@@ -275,13 +275,13 @@ where $||\cdot||_F$ is the Frobenius norm
 #### **E. Outlier Robustness Test**
 
 **Procedure**:
-1. Original dataset: $D_0$
-2. Contaminated dataset: $D_c$ (with known outliers injected)
+1. Original dataset: D₀
+2. Contaminated dataset: D_c (with known outliers injected)
 3. Apply both PCA methods
-4. Measure deviation of principal components between $D_0$ and $D_c$
+4. Measure deviation of principal components between D₀ and D_c
 
 **Robustness Metric**:
-$$ \text{Robustness} = 1 - \frac{\text{Component Deviation}}{|\text{Contamination Level}|} $$
+$$\text{Robustness} = 1 - \frac{\text{Component Deviation}}{|\text{Contamination Level}|}$$
 
 Higher robustness for COMAD indicates better outlier resistance
 
@@ -295,16 +295,16 @@ Higher robustness for COMAD indicates better outlier resistance
 
 Measure the total difference in projected data:
 
-$$ \text{Error}_{Frobenius} = ||X_{\text{Mean}} - X_{\text{COMAD}}||_F $$
+$$\text{Error}_{\text{Frobenius}} = \|X_{\text{Mean}} - X_{\text{COMAD}}\|_F$$
 
 Normalized version:
-$$ \text{Relative Error} = \frac{||X_{\text{Mean}} - X_{\text{COMAD}}||_F}{||X_{\text{Mean}}||_F} $$
+$$\text{Relative Error} = \frac{\|X_{\text{Mean}} - X_{\text{COMAD}}\|_F}{\|X_{\text{Mean}}\|_F}$$
 
 #### **B. Component Angle Differences**
 
 Measure angle between corresponding eigenvectors:
 
-$$ \theta_i = \arccos(|V_{\text{Mean}, i} \cdot V_{\text{COMAD}, i}|) $$
+$$\theta_i = \arccos(|V_{\text{Mean}, i} \cdot V_{\text{COMAD}, i}|)$$
 
 If angle is small → components are similar
 If angle is large → methods diverge significantly
@@ -313,13 +313,13 @@ If angle is large → methods diverge significantly
 
 Compare the importance ordering:
 
-$$ \Delta\lambda = |\lambda_{\text{Mean}} - \lambda_{\text{COMAD}}| $$
+$$\Delta\lambda = |\lambda_{\text{Mean}} - \lambda_{\text{COMAD}}|$$
 
 #### **D. Pairwise Distance Difference**
 
 For all pairs of samples:
 
-$$ D_{\text{diff}} = \text{PairwiseDistance}_{\text{Mean}} - \text{PairwiseDistance}_{\text{COMAD}} $$
+$$D_{\text{diff}} = \text{PairwiseDistance}_{\text{Mean}} - \text{PairwiseDistance}_{\text{COMAD}}$$
 
 - Calculate correlation between distance matrices
 - Compute mean absolute difference
@@ -327,7 +327,7 @@ $$ D_{\text{diff}} = \text{PairwiseDistance}_{\text{Mean}} - \text{PairwiseDista
 
 #### **E. Reconstruction Error Difference**
 
-$$ \Delta RE = \text{RE}_{\text{COMAD}} - \text{RE}_{\text{Mean}} $$
+$$\Delta RE = \text{RE}_{\text{COMAD}} - \text{RE}_{\text{Mean}}$$
 
 If negative → COMAD has better reconstruction
 If positive → Mean-based has better reconstruction
